@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0C41C4" />
+  <title>Calendario 2026 — Alek & Cata</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">🗓️</div>
+        <div class="brandText">
+          <div class="title">Calendario 2026</div>
+          <div class="subtitle">Alek / Cata / Musicala (con reglas y editable)</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="btn ghost" id="btnToday" title="Ir al mes actual">Hoy</button>
+        <button class="btn" id="btnReset" title="Recrear el calendario con reglas (borra ediciones)">Recrear con reglas</button>
+        <button class="btn ghost" id="btnExport" title="Exportar JSON">Exportar</button>
+        <label class="btn ghost fileBtn" title="Importar JSON">
+          Importar
+          <input type="file" id="fileImport" accept="application/json" />
+        </label>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="panel">
+        <div class="panelTop">
+          <div class="monthNav">
+            <button class="iconBtn" id="prevMonth" aria-label="Mes anterior">‹</button>
+            <div class="monthTitle" id="monthTitle">Enero 2026</div>
+            <button class="iconBtn" id="nextMonth" aria-label="Mes siguiente">›</button>
+          </div>
+
+          <div class="picker">
+            <label for="monthSelect">Mes</label>
+            <select id="monthSelect"></select>
+          </div>
+        </div>
+
+        <div class="legend">
+          <div class="chip alek">Casa Alek</div>
+          <div class="chip cata">Casa Cata</div>
+          <div class="chip musicala">Musicala</div>
+          <div class="chip note">Editado</div>
+        </div>
+
+        <div class="stats" id="stats"></div>
+      </section>
+
+      <section class="calendarWrap">
+        <div class="dow">
+          <div>Lun</div><div>Mar</div><div>Mié</div><div>Jue</div><div>Vie</div><div>Sáb</div><div>Dom</div>
+        </div>
+
+        <div class="grid" id="grid"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal edición -->
+  <div class="modalOverlay" id="modalOverlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modalHeader">
+        <div>
+          <div class="modalTitle" id="modalTitle">Editar día</div>
+          <div class="modalSub" id="modalSub">2026-01-01 (Jue)</div>
+        </div>
+        <button class="iconBtn" id="modalClose" aria-label="Cerrar">✕</button>
+      </div>
+
+      <div class="modalBody">
+        <div class="field">
+          <div class="label">¿Dónde dormimos?</div>
+          <div class="segmented" id="locPicker">
+            <button class="seg alek" data-loc="ALEK">Casa Alek</button>
+            <button class="seg cata" data-loc="CATA">Casa Cata</button>
+            <button class="seg musicala" data-loc="MUSICALA">Musicala</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label" for="note">Nota (opcional)</label>
+          <textarea id="note" rows="3" placeholder="Ej: Se cambió por visita familiar / evento / ensayo..."></textarea>
+        </div>
+
+        <div class="hint">
+          Tip: puedes volver a “regla” borrando la edición (botón abajo). Porque sí, los humanos cambian planes.
+        </div>
+      </div>
+
+      <div class="modalFooter">
+        <button class="btn ghost danger" id="btnClearEdit">Quitar edición</button>
+        <button class="btn" id="btnSaveEdit">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
