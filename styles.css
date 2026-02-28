@@ -1,5 +1,7 @@
 /* ===============================
-   TEMA CALENDARIO MUSICALA 2026
+   TEMA CALENDARIO MUSICALA 2026 (v2)
+   - Panel con Resumen mensual + Donut + Balance + Patrones
+   - Mantiene compatibilidad con tu layout y clases existentes
    =============================== */
 
 :root{
@@ -18,6 +20,12 @@
   --cata: #ff4fb0;
   --musicala: #23d3ff;
   --danger: #ff4d4d;
+
+  --ok: rgba(46, 204, 113, .95);
+  --warn: rgba(241, 196, 15, .95);
+  --bad: rgba(231, 76, 60, .95);
+
+  --ring: rgba(255,255,255,.22);
 }
 
 /* ===== RESET ===== */
@@ -32,6 +40,15 @@ body{
     radial-gradient(900px 700px at 55% 90%, rgba(35,211,255,.12), transparent 55%),
     var(--bg);
   color: var(--ink);
+}
+
+/* ===== ACCESIBILIDAD / SELECCIÓN ===== */
+::selection{
+  background: rgba(35,211,255,.24);
+}
+:focus-visible{
+  outline: 2px solid rgba(35,211,255,.45);
+  outline-offset: 2px;
 }
 
 /* ===== LAYOUT ===== */
@@ -71,7 +88,7 @@ body{
   font-size:20px;
 }
 .title{
-  font-weight:800;
+  font-weight:900;
   letter-spacing: .2px;
 }
 .subtitle{
@@ -94,14 +111,19 @@ body{
   color: var(--ink);
   padding: 10px 14px;
   border-radius: 999px;
-  font-weight: 600;
+  font-weight: 700;
   cursor:pointer;
-  transition: transform .05s ease, background .15s ease, border-color .15s ease;
+  transition: transform .05s ease, background .15s ease, border-color .15s ease, box-shadow .15s ease;
 }
-.btn:hover{ background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.20); }
+.btn:hover{
+  background: rgba(255,255,255,.14);
+  border-color: rgba(255,255,255,.20);
+  box-shadow: 0 8px 18px rgba(0,0,0,.20);
+}
 .btn:active{ transform: translateY(1px); }
-.btn.ghost{ background: transparent; }
+.btn.ghost{ background: transparent; box-shadow:none; }
 .btn.ghost:hover{ background: rgba(255,255,255,.07); }
+
 .btn.ghost.danger{
   border-color: rgba(255,77,77,.35);
   color: #ffd0d0;
@@ -160,13 +182,16 @@ body{
   cursor:pointer;
   display:grid;
   place-items:center;
-  transition: background .15s ease, transform .05s ease;
+  transition: background .15s ease, transform .05s ease, box-shadow .15s ease;
 }
-.iconBtn:hover{ background: rgba(255,255,255,.16); }
+.iconBtn:hover{
+  background: rgba(255,255,255,.16);
+  box-shadow: 0 8px 18px rgba(0,0,0,.20);
+}
 .iconBtn:active{ transform: translateY(1px); }
 
 .monthTitle{
-  font-weight: 800;
+  font-weight: 900;
   letter-spacing: .2px;
 }
 
@@ -200,7 +225,7 @@ body{
   gap:8px;
   padding: 8px 12px;
   border-radius: 999px;
-  font-weight: 700;
+  font-weight: 800;
   font-size: 12px;
   border: 1px solid var(--border);
   background: rgba(255,255,255,.08);
@@ -215,18 +240,216 @@ body{
 .chip.musicala::before{ background: var(--musicala); }
 .chip.note::before{ background: rgba(255,255,255,.75); }
 
-/* ===== STATS ===== */
+/* ======================================================================
+   NUEVO: BLOQUES DEL PANEL (Resumen / Patrones / Año)
+   ====================================================================== */
+
+.cardBlock{
+  margin-top: 12px;
+  padding: 12px 12px 12px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.06);
+}
+
+.cardTitleRow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom: 10px;
+}
+
+.cardTitle{
+  font-weight: 900;
+  letter-spacing: .2px;
+  font-size: 13px;
+  color: rgba(255,255,255,.90);
+}
+
+.cardPill{
+  font-size: 11px;
+  font-weight: 900;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.08);
+  color: rgba(255,255,255,.86);
+  white-space: nowrap;
+}
+.cardPill.ghost{
+  background: transparent;
+}
+.cardPill.ok{
+  border-color: rgba(46,204,113,.35);
+  color: rgba(200,255,220,.92);
+}
+.cardPill.warn{
+  border-color: rgba(241,196,15,.35);
+  color: rgba(255,246,200,.92);
+}
+.cardPill.bad{
+  border-color: rgba(231,76,60,.35);
+  color: rgba(255,210,210,.92);
+}
+
+/* ===== Resumen mensual layout ===== */
+.monthSummary{
+  display:grid;
+  grid-template-columns: 140px 1fr;
+  gap: 12px;
+  align-items:center;
+}
+
+/* Donut wrapper */
+.donutWrap{
+  position: relative;
+  width: 140px;
+  height: 140px;
+  display:grid;
+  place-items:center;
+  border-radius: 18px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.10);
+}
+
+/* SVG donut */
+.donut{
+  width: 120px;
+  height: 120px;
+  overflow: visible;
+  transform: rotate(-90deg);
+  filter: drop-shadow(0 10px 18px rgba(0,0,0,.22));
+}
+.donutTrack{
+  fill: none;
+  stroke: rgba(255,255,255,.10);
+  stroke-width: 12;
+}
+.donutSeg{
+  fill: none;
+  stroke-width: 12;
+  stroke-linecap: round;
+  stroke-dasharray: 0 999;
+  stroke-dashoffset: 0;
+  transition: stroke-dasharray .35s ease, stroke-dashoffset .35s ease;
+}
+
+.donutAlek{ stroke: var(--alek); }
+.donutCata{ stroke: var(--cata); }
+.donutMusi{ stroke: var(--musicala); }
+
+/* Centro del donut */
+.donutCenter{
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  pointer-events:none;
+}
+.donutBig{
+  font-weight: 900;
+  font-size: 18px;
+  letter-spacing: .2px;
+}
+.donutSmall{
+  font-size: 11px;
+  color: var(--muted2);
+  margin-top: -2px;
+}
+
+/* Breakdown */
+.monthBreakdown{
+  display:flex;
+  flex-direction:column;
+  gap: 8px;
+}
+
+.monthBreakdown .row{
+  display:grid;
+  grid-template-columns: 14px 1fr auto;
+  align-items:center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.04);
+}
+.monthBreakdown .lbl{
+  font-size: 12px;
+  font-weight: 800;
+  color: rgba(255,255,255,.86);
+}
+.monthBreakdown .val{
+  font-size: 12px;
+  font-weight: 900;
+  color: rgba(255,255,255,.92);
+}
+
+.swatch{
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  box-shadow: 0 0 0 4px rgba(255,255,255,.06);
+}
+.swatch.alek{ background: var(--alek); }
+.swatch.cata{ background: var(--cata); }
+.swatch.musicala{ background: var(--musicala); }
+
+.miniHint{
+  margin-top: 4px;
+  padding: 10px 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.03);
+  color: rgba(255,255,255,.72);
+  font-size: 12px;
+  line-height: 1.35;
+}
+.miniHint.subtle{
+  color: rgba(255,255,255,.62);
+}
+
+/* ===== Patrones ===== */
+.patterns{
+  display:flex;
+  flex-direction:column;
+  gap: 8px;
+}
+.pRow{
+  display:grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items:center;
+  padding: 9px 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.04);
+}
+.pKey{
+  font-size: 12px;
+  font-weight: 800;
+  color: rgba(255,255,255,.78);
+}
+.pVal{
+  font-size: 12px;
+  font-weight: 900;
+  color: rgba(255,255,255,.92);
+}
+
+/* ===== STATS (AÑO) ===== */
 .stats{
-  margin-top: 14px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(255,255,255,.12);
+  margin-top: 2px;
   color: var(--muted);
   font-size: 13px;
   line-height: 1.55;
 }
 .stats strong{ color: var(--ink); }
 
-/* ===== CALENDARIO ===== */
+/* ======================================================================
+   CALENDARIO
+   ====================================================================== */
 .calendarWrap{
   background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
   border: 1px solid var(--border);
@@ -242,7 +465,7 @@ body{
   gap: 10px;
   padding: 0 4px 10px 4px;
   color: var(--muted2);
-  font-weight: 700;
+  font-weight: 800;
   font-size: 12px;
 }
 
@@ -261,16 +484,25 @@ body{
   padding: 10px;
   cursor:pointer;
   position: relative;
-  transition: background .15s ease, transform .05s ease, border-color .15s ease;
+  transition: background .15s ease, transform .05s ease, border-color .15s ease, box-shadow .15s ease;
 }
-.day:hover{ background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.20); }
+.day:hover{
+  background: rgba(255,255,255,.10);
+  border-color: rgba(255,255,255,.20);
+  box-shadow: 0 14px 26px rgba(0,0,0,.22);
+}
 .day:active{ transform: translateY(1px); }
 
 .day.muted{
   opacity:.40;
   cursor: default;
 }
-.day.muted:hover{ background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.12); transform:none; }
+.day.muted:hover{
+  background: rgba(255,255,255,.06);
+  border-color: rgba(255,255,255,.12);
+  box-shadow:none;
+  transform:none;
+}
 
 .dayTop{
   display:flex;
@@ -284,7 +516,7 @@ body{
 }
 .badge{
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 900;
   padding: 5px 10px;
   border-radius: 999px;
   border: 1px solid rgba(255,255,255,.16);
@@ -327,6 +559,7 @@ body{
 .todayRing{
   outline: 2px solid rgba(255,255,255,.35);
   outline-offset: 0px;
+  box-shadow: 0 0 0 6px rgba(255,255,255,.06), 0 18px 30px rgba(0,0,0,.22);
 }
 
 /* ===== MODAL ===== */
@@ -369,7 +602,7 @@ body{
   padding: 16px;
 }
 .field{ margin-bottom: 12px; }
-.label{ font-weight: 800; margin-bottom: 8px; display:block; }
+.label{ font-weight: 900; margin-bottom: 8px; display:block; }
 
 /* ===== SEGMENTED ===== */
 .segmented{
@@ -385,9 +618,12 @@ body{
   font-weight: 900;
   padding: 10px 12px;
   cursor:pointer;
-  transition: transform .05s ease, background .15s ease, border-color .15s ease;
+  transition: transform .05s ease, background .15s ease, border-color .15s ease, box-shadow .15s ease;
 }
-.seg:hover{ background: rgba(255,255,255,.14); }
+.seg:hover{
+  background: rgba(255,255,255,.14);
+  box-shadow: 0 10px 20px rgba(0,0,0,.20);
+}
 .seg:active{ transform: translateY(1px); }
 .seg.active{
   background: rgba(255,255,255,.22);
@@ -428,7 +664,31 @@ textarea:focus{
   border-top: 1px solid rgba(255,255,255,.12);
 }
 
+/* ===== SCROLLBAR (sutil) ===== */
+*{
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,.18) transparent;
+}
+*::-webkit-scrollbar{ height: 10px; width: 10px; }
+*::-webkit-scrollbar-thumb{
+  background: rgba(255,255,255,.16);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:hover{
+  background: rgba(255,255,255,.22);
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 980px){
   .main{ grid-template-columns: 1fr; }
+  .monthSummary{ grid-template-columns: 140px 1fr; }
+}
+
+@media (max-width: 520px){
+  .controls{ gap:8px; }
+  .btn{ padding: 9px 12px; font-size: 13px; }
+  .monthSummary{ grid-template-columns: 1fr; }
+  .donutWrap{ width: 100%; height: 150px; }
 }

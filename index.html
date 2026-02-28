@@ -5,24 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#0C41C4" />
   <title>Calendario 2026 — Alek & Cata</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="./styles.css" />
 </head>
 
 <body>
   <div class="app">
     <header class="topbar">
-      <div class="brand">
-        <div class="logo">🗓️</div>
+      <div class="brand" role="banner" aria-label="Encabezado de la app">
+        <div class="logo" aria-hidden="true">🗓️</div>
         <div class="brandText">
           <div class="title">Calendario 2026</div>
-          <div class="subtitle">Alek / Cata / Musicala (con reglas y editable)</div>
+          <div class="subtitle">Alek / Cata / Musicala (con reglas, editable y con métricas)</div>
         </div>
       </div>
 
-      <div class="controls">
+      <div class="controls" role="toolbar" aria-label="Acciones principales">
         <button class="btn ghost" id="btnToday" title="Ir al mes actual">Hoy</button>
         <button class="btn" id="btnReset" title="Recrear el calendario con reglas (borra ediciones)">Recrear con reglas</button>
         <button class="btn ghost" id="btnExport" title="Exportar JSON">Exportar</button>
@@ -33,10 +35,11 @@
       </div>
     </header>
 
-    <main class="main">
-      <section class="panel">
+    <main class="main" role="main">
+      <!-- PANEL LATERAL -->
+      <section class="panel" aria-label="Panel de información">
         <div class="panelTop">
-          <div class="monthNav">
+          <div class="monthNav" aria-label="Navegación por meses">
             <button class="iconBtn" id="prevMonth" aria-label="Mes anterior">‹</button>
             <div class="monthTitle" id="monthTitle">Enero 2026</div>
             <button class="iconBtn" id="nextMonth" aria-label="Mes siguiente">›</button>
@@ -44,26 +47,114 @@
 
           <div class="picker">
             <label for="monthSelect">Mes</label>
-            <select id="monthSelect"></select>
+            <select id="monthSelect" aria-label="Seleccionar mes"></select>
           </div>
         </div>
 
-        <div class="legend">
+        <!-- Leyenda -->
+        <div class="legend" aria-label="Leyenda de colores">
           <div class="chip alek">Casa Alek</div>
           <div class="chip cata">Casa Cata</div>
           <div class="chip musicala">Musicala</div>
           <div class="chip note">Editado</div>
         </div>
 
-        <div class="stats" id="stats"></div>
+        <!-- NUEVO: Resumen mensual -->
+        <section class="cardBlock" aria-label="Resumen del mes">
+          <div class="cardTitleRow">
+            <div class="cardTitle">Resumen del mes</div>
+            <div class="cardPill" id="monthBalancePill" aria-live="polite">—</div>
+          </div>
+
+          <div class="monthSummary">
+            <!-- Donut (SVG) -->
+            <div class="donutWrap" aria-label="Gráfico de proporciones del mes">
+              <svg class="donut" viewBox="0 0 120 120" role="img" aria-label="Proporciones del mes">
+                <!-- fondo -->
+                <circle class="donutTrack" cx="60" cy="60" r="46"></circle>
+
+                <!-- segmentos: se setean por JS con stroke-dasharray -->
+                <circle class="donutSeg donutAlek" cx="60" cy="60" r="46"></circle>
+                <circle class="donutSeg donutCata" cx="60" cy="60" r="46"></circle>
+                <circle class="donutSeg donutMusi" cx="60" cy="60" r="46"></circle>
+              </svg>
+
+              <div class="donutCenter">
+                <div class="donutBig" id="monthTotalNights">—</div>
+                <div class="donutSmall">noches</div>
+              </div>
+            </div>
+
+            <!-- Lista de % -->
+            <div class="monthBreakdown" aria-live="polite">
+              <div class="row">
+                <span class="swatch alek" aria-hidden="true"></span>
+                <span class="lbl">Casa Alek</span>
+                <span class="val" id="monthPctAlek">—</span>
+              </div>
+              <div class="row">
+                <span class="swatch cata" aria-hidden="true"></span>
+                <span class="lbl">Casa Cata</span>
+                <span class="val" id="monthPctCata">—</span>
+              </div>
+              <div class="row">
+                <span class="swatch musicala" aria-hidden="true"></span>
+                <span class="lbl">Musicala</span>
+                <span class="val" id="monthPctMusi">—</span>
+              </div>
+
+              <div class="miniHint" id="monthBalanceHint" aria-live="polite">
+                — 
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- NUEVO: Patrones -->
+        <section class="cardBlock" aria-label="Patrones del mes">
+          <div class="cardTitleRow">
+            <div class="cardTitle">Patrones</div>
+            <div class="cardPill ghost" id="patternsPill" aria-live="polite">—</div>
+          </div>
+
+          <div class="patterns" aria-live="polite">
+            <div class="pRow">
+              <span class="pKey">Racha más larga en un mismo lugar</span>
+              <span class="pVal" id="patLongestStreak">—</span>
+            </div>
+            <div class="pRow">
+              <span class="pKey">Fines de semana seguidos iguales</span>
+              <span class="pVal" id="patWeekendRuns">—</span>
+            </div>
+            <div class="pRow">
+              <span class="pKey">Días editados este mes</span>
+              <span class="pVal" id="patEditedThisMonth">—</span>
+            </div>
+
+            <div class="miniHint subtle" id="patternsHint">
+              Tip: los “patrones” no juzgan. Solo delatan. 😌
+            </div>
+          </div>
+        </section>
+
+        <!-- Stats anuales (se mantiene) -->
+        <section class="cardBlock" aria-label="Totales del año">
+          <div class="cardTitleRow">
+            <div class="cardTitle">Año (totales 2026)</div>
+            <div class="cardPill ghost" id="yearEditedPill" aria-live="polite">—</div>
+          </div>
+
+          <div class="stats" id="stats" aria-live="polite"></div>
+        </section>
       </section>
 
-      <section class="calendarWrap">
-        <div class="dow">
+      <!-- CALENDARIO -->
+      <section class="calendarWrap" aria-label="Calendario mensual">
+        <div class="dow" aria-hidden="true">
           <div>Lun</div><div>Mar</div><div>Mié</div><div>Jue</div><div>Vie</div><div>Sáb</div><div>Dom</div>
         </div>
 
-        <div class="grid" id="grid"></div>
+        <div class="grid" id="grid" aria-label="Cuadrícula del calendario"></div>
       </section>
     </main>
   </div>
@@ -82,10 +173,10 @@
       <div class="modalBody">
         <div class="field">
           <div class="label">¿Dónde dormimos?</div>
-          <div class="segmented" id="locPicker">
-            <button class="seg alek" data-loc="ALEK">Casa Alek</button>
-            <button class="seg cata" data-loc="CATA">Casa Cata</button>
-            <button class="seg musicala" data-loc="MUSICALA">Musicala</button>
+          <div class="segmented" id="locPicker" role="group" aria-label="Selector de lugar">
+            <button class="seg alek" data-loc="ALEK" type="button">Casa Alek</button>
+            <button class="seg cata" data-loc="CATA" type="button">Casa Cata</button>
+            <button class="seg musicala" data-loc="MUSICALA" type="button">Musicala</button>
           </div>
         </div>
 
@@ -100,8 +191,8 @@
       </div>
 
       <div class="modalFooter">
-        <button class="btn ghost danger" id="btnClearEdit">Quitar edición</button>
-        <button class="btn" id="btnSaveEdit">Guardar</button>
+        <button class="btn ghost danger" id="btnClearEdit" type="button">Quitar edición</button>
+        <button class="btn" id="btnSaveEdit" type="button">Guardar</button>
       </div>
     </div>
   </div>
