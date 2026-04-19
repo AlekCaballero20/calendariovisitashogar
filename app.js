@@ -17,6 +17,7 @@
  * - ✅ Cálculos y utilidades más ordenadas
  * - ✅ Texto del panel anual más claro
  * - ✅ Preparado para el HTML/CSS mejorados
+ * - ✅ Badge con data-initial para inicial en móvil
  */
 
 const YEAR = 2026;
@@ -306,6 +307,8 @@ function createDayCell({ dayNumber, key, date, effective, isEdited, isToday }) {
   const locClass = locToCssClass(effective.loc);
   const label = LOC_LABEL[effective.loc] || effective.loc;
   const shortLabel = getShortLocLabel(effective.loc);
+  // Primera letra de shortLabel para mostrar en móvil ("A", "C", "M")
+  const initial = shortLabel.charAt(0);
   const dow = DOW_LABEL[date.getDay()];
   const note = (effective.note || '').trim();
 
@@ -329,9 +332,9 @@ function createDayCell({ dayNumber, key, date, effective, isEdited, isToday }) {
     ${isEdited ? `<div class="editedMark" title="Editado"></div>` : ''}
     <div class="dayTop">
       <div class="num">${dayNumber}</div>
-      <div class="badge" title="${escAttr(label)}">${escText(shortLabel)}</div>
+      <div class="badge" data-initial="${escAttr(initial)}" title="${escAttr(label)}">${escText(shortLabel)}</div>
     </div>
-    <div class="dot" title="${escAttr(label)}">${escText(label)}</div>
+    <div class="dot" data-short="${escAttr(shortLabel)}" title="${escAttr(label)}">${escText(label)}</div>
   `;
 
   cell.addEventListener('keydown', (e) => {
@@ -473,21 +476,7 @@ function applyMonthBalanceUI(summary) {
 
 function renderDonutLabel(summary) {
   if (!$donutLabel) return;
-
-  const diff = Math.abs(summary.pct[LOC.ALEK] - summary.pct[LOC.CATA]);
-
-  if (summary.total <= 0) {
-    $donutLabel.textContent = 'sin datos';
-    return;
-  }
-
-  if (diff < 8) {
-    $donutLabel.textContent = 'noches este mes';
-  } else if (summary.pct[LOC.ALEK] > summary.pct[LOC.CATA]) {
-    $donutLabel.textContent = 'más noches en Casa Alek';
-  } else {
-    $donutLabel.textContent = 'más noches en Casa Cata';
-  }
+  $donutLabel.textContent = '';
 }
 
 function getTopLoc(counts) {
@@ -762,7 +751,7 @@ function renderStatsForYear() {
     <div>🎭 Musicala: <strong>${counts[LOC.MUSICALA]}</strong> noches</div>
     <div>✍️ Días editados: <strong>${edited}</strong></div>
     <div style="margin-top:10px; color: rgba(255,255,255,.62); font-size:12px; line-height:1.5;">
-      Sábados “Musicala del mes”:
+      Sábados "Musicala del mes":
       <div style="margin-top:6px;">${monthlySatList}</div>
     </div>
   `;

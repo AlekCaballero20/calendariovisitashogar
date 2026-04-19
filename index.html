@@ -118,25 +118,26 @@
             <select id="monthSelect" aria-label="Selector de mes"></select>
           </div>
         </div>
+        <div class="calendarTable" aria-label="Tabla mensual">
+          <!-- DÍAS DE LA SEMANA -->
+          <div class="dow" aria-hidden="true">
+            <div><span>Lun</span></div>
+            <div><span>Mar</span></div>
+            <div><span>Mié</span></div>
+            <div><span>Jue</span></div>
+            <div><span>Vie</span></div>
+            <div><span>Sáb</span></div>
+            <div><span>Dom</span></div>
+          </div>
 
-        <!-- DÍAS DE LA SEMANA -->
-        <div class="dow" aria-hidden="true">
-          <div><span>Lun</span></div>
-          <div><span>Mar</span></div>
-          <div><span>Mié</span></div>
-          <div><span>Jue</span></div>
-          <div><span>Vie</span></div>
-          <div><span>Sáb</span></div>
-          <div><span>Dom</span></div>
+          <!-- GRID -->
+          <div
+            class="grid"
+            id="grid"
+            role="grid"
+            aria-label="Días del mes"
+          ></div>
         </div>
-
-        <!-- GRID -->
-        <div
-          class="grid"
-          id="grid"
-          role="grid"
-          aria-label="Días del mes"
-        ></div>
       </section>
 
       <!-- PANEL -->
