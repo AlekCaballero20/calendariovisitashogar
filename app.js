@@ -22,6 +22,7 @@
 
 const YEAR = 2026;
 const LS_KEY = 'stayCalendar2026_v1';
+const LS_BACKUP_KEY = 'stayCalendar2026_v1_backup';
 
 const LOC = Object.freeze({
   ALEK: 'ALEK',
@@ -803,18 +804,42 @@ function loadStore() {
   try {
     const raw = localStorage.getItem(LS_KEY);
     if (!raw) {
-      return { overrides: {}, meta: { monthlySaturday: {} }, version: '3.0' };
+      return loadBackupStoreOrDefault();
     }
 
     const data = JSON.parse(raw);
-    return sanitizeImportedStore(data);
+    const safe = sanitizeImportedStore(data);
+    persistBackupSnapshot(safe);
+    return safe;
   } catch {
-    return { overrides: {}, meta: { monthlySaturday: {} }, version: '3.0' };
+    return loadBackupStoreOrDefault();
   }
 }
 
 function saveStore() {
   localStorage.setItem(LS_KEY, JSON.stringify(store, null, 2));
+  persistBackupSnapshot(store);
+}
+
+function loadBackupStoreOrDefault() {
+  try {
+    const backupRaw = localStorage.getItem(LS_BACKUP_KEY);
+    if (!backupRaw) {
+      return { overrides: {}, meta: { monthlySaturday: {} }, version: '3.0' };
+    }
+    const backupData = JSON.parse(backupRaw);
+    return sanitizeImportedStore(backupData);
+  } catch {
+    return { overrides: {}, meta: { monthlySaturday: {} }, version: '3.0' };
+  }
+}
+
+function persistBackupSnapshot(data) {
+  try {
+    localStorage.setItem(LS_BACKUP_KEY, JSON.stringify(data, null, 2));
+  } catch {
+    // Silencioso: el respaldo es best-effort.
+  }
 }
 
 // ---------- Export / Import ----------
