@@ -1395,7 +1395,7 @@ textarea:focus{
   }
 
   /* Color del círculo según la ubicación del día */
-  .day.alek     .badge{ background:var(--alek); }
+.day.alek     .badge{ background:var(--alek); }
   .day.cata     .badge{ background:var(--cata); }
   .day.musicala .badge{ background:var(--musicala); }
 
@@ -1521,3 +1521,48 @@ textarea:focus{
     .day{ min-height:78px; }
   }
 }
+
+/* ===== PLANES Y EVENTOS FAMILIARES ===== */
+.chip.event{ border-color:rgba(255,196,61,.35); background:rgba(255,196,61,.10); color:#ffe4a3; }
+.eventBadge{ position:absolute; z-index:3; top:42px; left:10px; right:10px; display:flex; align-items:center; gap:5px; padding:5px 7px; border-radius:9px; background:rgba(255,196,61,.16); border:1px solid rgba(255,196,61,.30); color:#fff1c9; font-size:10px; line-height:1; overflow:hidden; }
+.eventBadge.important{ background:rgba(255,164,61,.24); border-color:rgba(255,196,61,.55); }
+.eventBadge span{ color:#ffc43d; }
+.eventBadge time{ font-weight:900; flex:0 0 auto; }
+.eventBadge b{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.eventEditor{ margin-top:18px; padding:14px; border:1px solid rgba(255,196,61,.24); border-radius:18px; background:rgba(255,196,61,.06); }
+.eventEditorHead{ display:flex; justify-content:space-between; gap:12px; margin-bottom:14px; }
+.eventEditorHead .label{ margin-bottom:3px; }
+.eventEditorHead p{ margin:0; color:var(--muted2); font-size:12px; line-height:1.4; }
+.eventEditorHead > span{ font-size:22px; }
+.eventOptions{ display:grid; grid-template-columns:minmax(0,1fr) auto; gap:14px; align-items:end; }
+.eventOptions .field{ margin-bottom:0; }
+.eventEditor input[type="text"], .eventEditor input[type="time"]{ width:100%; min-height:44px; border-radius:14px; border:1px solid rgba(255,255,255,.16); background:rgba(255,255,255,.08); color:var(--ink); padding:10px 12px; outline:none; font:inherit; }
+.eventEditor input:focus{ border-color:rgba(255,196,61,.45); box-shadow:0 0 0 3px rgba(255,196,61,.10); }
+.importantCheck{ min-height:44px; display:flex; align-items:center; gap:8px; font-size:12px; font-weight:800; cursor:pointer; }
+.importantCheck input{ width:18px; height:18px; accent-color:#ffc43d; }
+
+@media (max-width:640px){
+  .eventOptions{ grid-template-columns:1fr; }
+}
+
+/* ===== AGENDA DE EVENTOS ===== */
+.eventsCard{ border-color:rgba(255,196,61,.24); }
+.eventCountPill{ border-color:rgba(255,196,61,.30); color:#ffe4a3; }
+.eventsIntro{ margin:0 0 12px; color:var(--muted2); font-size:12px; line-height:1.45; }
+.eventsList{ display:flex; flex-direction:column; gap:8px; max-height:420px; overflow:auto; padding-right:3px; }
+.eventListItem{ width:100%; display:grid; grid-template-columns:45px minmax(0,1fr) auto; gap:10px; align-items:center; padding:9px; border-radius:14px; border:1px solid rgba(255,255,255,.11); background:rgba(255,255,255,.045); color:var(--ink); text-align:left; cursor:pointer; font:inherit; }
+.eventListItem:hover{ background:rgba(255,255,255,.09); border-color:rgba(255,196,61,.30); }
+.eventListItem.important{ background:rgba(255,196,61,.08); border-color:rgba(255,196,61,.25); }
+.eventListItem.past{ opacity:.58; }
+.eventDateBox{ width:45px; min-height:46px; border-radius:12px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:rgba(255,196,61,.13); color:#ffe4a3; }
+.eventDateBox b{ font-size:17px; line-height:1; }
+.eventDateBox small{ margin-top:3px; font-size:9px; font-weight:900; text-transform:uppercase; }
+.eventListInfo{ min-width:0; display:flex; flex-direction:column; gap:5px; }
+.eventListInfo strong{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:12px; }
+.eventListInfo strong i{ color:#ffc43d; font-style:normal; margin-right:5px; }
+.eventListInfo small{ color:var(--muted2); font-size:10px; }
+.eventEditHint{ color:#ffe4a3; font-size:10px; font-weight:900; }
+.eventsEmpty{ padding:24px 14px; border:1px dashed rgba(255,255,255,.16); border-radius:16px; text-align:center; color:var(--muted2); }
+.eventsEmpty span{ display:block; font-size:26px; margin-bottom:8px; }
+.eventsEmpty strong{ display:block; color:var(--ink); font-size:13px; }
+.eventsEmpty p{ margin:5px 0 0; font-size:11px; line-height:1.45; }

@@ -64,6 +64,8 @@ const $grid = document.getElementById('grid');
 const $monthTitle = document.getElementById('monthTitle');
 const $monthSelect = document.getElementById('monthSelect');
 const $stats = document.getElementById('stats');
+const $eventsList = document.getElementById('eventsList');
+const $eventCountPill = document.getElementById('eventCountPill');
 
 const $prevMonth = document.getElementById('prevMonth');
 const $nextMonth = document.getElementById('nextMonth');
@@ -78,6 +80,9 @@ const $modalTitle = document.getElementById('modalTitle');
 const $modalSub = document.getElementById('modalSub');
 const $locPicker = document.getElementById('locPicker');
 const $note = document.getElementById('note');
+const $eventTitle = document.getElementById('eventTitle');
+const $eventTime = document.getElementById('eventTime');
+const $eventImportant = document.getElementById('eventImportant');
 const $btnSaveEdit = document.getElementById('btnSaveEdit');
 const $btnClearEdit = document.getElementById('btnClearEdit');
 
@@ -147,6 +152,10 @@ function bindEvents() {
     $grid.addEventListener('click', handleGridClick);
   }
 
+  if ($eventsList) {
+    $eventsList.addEventListener('click', handleEventListClick);
+  }
+
   if ($modalClose) {
     $modalClose.addEventListener('click', closeModal);
   }
@@ -210,18 +219,31 @@ function handleGridClick(e) {
   openModal(key, fromIsoKey(key));
 }
 
+function handleEventListClick(e) {
+  const button = e.target.closest?.('button[data-event-date]');
+  if (!button) return;
+  const key = button.dataset.eventDate;
+  const date = fromIsoKey(key);
+  if (!date) return;
+  setMonth(date.getMonth());
+  openModal(key, date);
+}
+
 function saveModalEdit() {
   if (!modalDateKey) return;
 
   const loc = getActiveLocButton();
   const note = ($note?.value || '').trim();
+  const eventTitle = ($eventTitle?.value || '').trim();
+  const eventTime = eventTitle ? ($eventTime?.value || '') : '';
+  const eventImportant = Boolean(eventTitle && $eventImportant?.checked);
   const ruleLoc = getRuleLocByKey(modalDateKey);
 
   // Si queda igual a la regla y sin nota, limpiamos override
-  if (loc === ruleLoc && !note) {
+  if (loc === ruleLoc && !note && !eventTitle) {
     delete store.overrides[modalDateKey];
   } else {
-    store.overrides[modalDateKey] = { loc, note };
+    store.overrides[modalDateKey] = { loc, note, eventTitle, eventTime, eventImportant };
   }
 
   saveStore();
@@ -250,6 +272,7 @@ function render() {
 
   MONTH_CACHE = null;
   renderCalendarGrid();
+  renderEventsList();
   renderStatsForYear();
   renderMonthInsights();
 }
@@ -312,6 +335,8 @@ function createDayCell({ dayNumber, key, date, effective, isEdited, isToday }) {
   const initial = shortLabel.charAt(0);
   const dow = DOW_LABEL[date.getDay()];
   const note = (effective.note || '').trim();
+  const eventTitle = (effective.eventTitle || '').trim();
+  const eventTime = effective.eventTime || '';
 
   const tooltipParts = [
     `${key} (${dow})`,
@@ -320,13 +345,14 @@ function createDayCell({ dayNumber, key, date, effective, isEdited, isToday }) {
   ];
 
   if (note) tooltipParts.push(`Nota: ${note}`);
+  if (eventTitle) tooltipParts.push(`Plan: ${eventTime ? `${eventTime} · ` : ''}${eventTitle}`);
 
   const cell = document.createElement('div');
   cell.className = `day ${locClass}${isToday ? ' todayRing' : ''}`;
   cell.setAttribute('data-date', key);
   cell.setAttribute('role', 'gridcell');
   cell.setAttribute('tabindex', '0');
-  cell.setAttribute('aria-label', `${dayNumber}, ${label}${isEdited ? ', editado' : ''}`);
+  cell.setAttribute('aria-label', `${dayNumber}, ${label}${eventTitle ? `, plan: ${eventTitle}` : ''}${isEdited ? ', editado' : ''}`);
   cell.setAttribute('title', tooltipParts.join(' · '));
 
   cell.innerHTML = `
@@ -335,6 +361,7 @@ function createDayCell({ dayNumber, key, date, effective, isEdited, isToday }) {
       <div class="num">${dayNumber}</div>
       <div class="badge" data-initial="${escAttr(initial)}" title="${escAttr(label)}">${escText(shortLabel)}</div>
     </div>
+    ${eventTitle ? `<div class="eventBadge${effective.eventImportant ? ' important' : ''}" title="${escAttr(eventTitle)}"><span>${effective.eventImportant ? '★' : '●'}</span>${eventTime ? `<time>${escText(eventTime)}</time>` : ''}<b>${escText(eventTitle)}</b></div>` : ''}
     <div class="dot" data-short="${escAttr(shortLabel)}" title="${escAttr(label)}">${escText(label)}</div>
   `;
 
@@ -664,9 +691,9 @@ function ensureDefaults(forceRecalcMonthlySaturday = false) {
 function getEffectiveForDate(key) {
   const ov = store.overrides[key];
   if (ov && ov.loc) {
-    return { loc: ov.loc, note: ov.note || '' };
+    return { loc: ov.loc, note: ov.note || '', eventTitle: ov.eventTitle || '', eventTime: ov.eventTime || '', eventImportant: Boolean(ov.eventImportant) };
   }
-  return { loc: getRuleLocByKey(key), note: '' };
+  return { loc: getRuleLocByKey(key), note: '', eventTitle: '', eventTime: '', eventImportant: false };
 }
 
 function getRuleLocByKey(key) {
@@ -771,6 +798,9 @@ function openModal(key, dateObj) {
 
   const ov = store.overrides[key];
   if ($note) $note.value = (ov?.note || '');
+  if ($eventTitle) $eventTitle.value = (ov?.eventTitle || '');
+  if ($eventTime) $eventTime.value = (ov?.eventTime || '');
+  if ($eventImportant) $eventImportant.checked = Boolean(ov?.eventImportant);
 
   if ($modalOverlay) $modalOverlay.hidden = false;
 
@@ -783,6 +813,9 @@ function closeModal() {
   if ($modalOverlay) $modalOverlay.hidden = true;
   modalDateKey = null;
   if ($note) $note.value = '';
+  if ($eventTitle) $eventTitle.value = '';
+  if ($eventTime) $eventTime.value = '';
+  if ($eventImportant) $eventImportant.checked = false;
 }
 
 function setActiveLocButton(loc) {
@@ -814,6 +847,31 @@ function loadStore() {
   } catch {
     return loadBackupStoreOrDefault();
   }
+}
+
+function renderEventsList() {
+  if (!$eventsList || !$eventCountPill) return;
+  const events = Object.entries(store.overrides)
+    .filter(([, item]) => Boolean(item?.eventTitle?.trim()))
+    .map(([key, item]) => ({ key, ...item }))
+    .sort((a, b) => a.key.localeCompare(b.key) || (a.eventTime || '').localeCompare(b.eventTime || ''));
+
+  $eventCountPill.textContent = `${events.length} ${events.length === 1 ? 'anotado' : 'anotados'}`;
+  if (!events.length) {
+    $eventsList.innerHTML = `<div class="eventsEmpty"><span aria-hidden="true">🗓️</span><strong>Aún no hay planes anotados</strong><p>Toca cualquier día del calendario para agregar el primero.</p></div>`;
+    return;
+  }
+
+  const todayKey = isoKey(new Date());
+  $eventsList.innerHTML = events.map((event) => {
+    const date = fromIsoKey(event.key);
+    const isPast = event.key < todayKey;
+    return `<button class="eventListItem${event.eventImportant ? ' important' : ''}${isPast ? ' past' : ''}" data-event-date="${escAttr(event.key)}" type="button">
+      <span class="eventDateBox"><b>${date.getDate()}</b><small>${escText(MONTHS_ES[date.getMonth()].slice(0, 3))}</small></span>
+      <span class="eventListInfo"><strong>${event.eventImportant ? '<i aria-label="Importante">★</i>' : ''}${escText(event.eventTitle)}</strong><small>${event.eventTime ? `${escText(event.eventTime)} · ` : ''}${isPast ? 'Evento pasado' : LOC_LABEL[event.loc] || ''}</small></span>
+      <span class="eventEditHint">Editar</span>
+    </button>`;
+  }).join('');
 }
 
 function saveStore() {
@@ -886,13 +944,16 @@ function sanitizeImportedStore(data) {
 
     const loc = v.loc;
     const note = (v.note ?? '').toString();
+    const eventTitle = (v.eventTitle ?? '').toString().trim().slice(0, 80);
+    const eventTime = /^\d{2}:\d{2}$/.test(v.eventTime || '') ? v.eventTime : '';
+    const eventImportant = Boolean(v.eventImportant && eventTitle);
 
     if (loc !== LOC.ALEK && loc !== LOC.CATA && loc !== LOC.MUSICALA) {
       delete safe.overrides[k];
       continue;
     }
 
-    safe.overrides[k] = { loc, note };
+    safe.overrides[k] = { loc, note, eventTitle, eventTime, eventImportant };
   }
 
   for (const [ym, day] of Object.entries(safe.meta.monthlySaturday)) {
